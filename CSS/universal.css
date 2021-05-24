@@ -1,0 +1,14 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+.u-heading-1 {
+    margin-bottom: 1.5rem;
+}
+.u-heading-2 {
+    margin: 1rem 0;
+}
+.u-text {
+    line-height: 1.5;
+    margin: 1rem 0;
+}

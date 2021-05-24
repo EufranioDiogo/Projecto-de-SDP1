@@ -1,0 +1,49 @@
+portifolio
+	-pk_producto
+	-designacao
+	-fk_producto
+
+armazem
+	-pk_armazem
+	-fk_producto
+	-quant_maxima
+	-quant_actual
+
+tabela_de_preco
+	-fk_producto
+	-preco
+	-data_de_actualizacao
+
+usuario
+	-pk_user
+	-nome_usuario
+	-password
+	-tipo_usuario
+	-fk_localizacao
+	
+localizacao
+	-pk_localizacao
+	-fk_provincia
+	-fk_municipio
+	-fk_distrito
+	-fk_comuna
+
+provincia
+	-pk_provincia
+	-nome_provincia
+
+municipio
+	-pk_municipio
+	-nome_municipio
+	-fk_provincia
+
+distrito
+	-pk_distrito
+	-nome_distrito
+	-fk_municipio
+
+comuna
+	-pk_comuna
+	-nome_comuna
+	-fk_municipio
+
