@@ -4,6 +4,7 @@
     Author     : ed
 --%>
 
+<%@page import="java.io.FileNotFoundException"%>
 <%@page import="org.apache.poi.ss.usermodel.CellType"%>
 <%@page import="org.apache.poi.ss.usermodel.Cell"%>
 <%@page import="java.util.Iterator"%>
@@ -41,29 +42,51 @@
             setupPortfolio();
         } catch (Exception e)
         {
-            goToErroPage();
+
         }
 
     }
 
-    public void setupPortfolio() throws ServletException
+    public void setupPortfolio()
     {
 
-        try
-        {
             File file = new File(PORTFOLIO_NAME);
 
-            if (file.createNewFile())
+            try
             {
-                System.out.println("File Created");
-            } else
+                if (file.createNewFile())
+                {
+                    System.out.println("File Created");
+                } else
+                {
+                    System.out.println("File Exists");
+                }
+            } catch (IOException e)
             {
-                System.out.println("File Exists");
+                System.out.println("IO Exception creating the file");
+            }
+            
+            FileInputStream fileInputStream = null;
+
+            try
+            {
+                fileInputStream = new FileInputStream(file);
+            } catch (FileNotFoundException e)
+            {
+                System.out.println("File not founde");
             }
 
+            HSSFWorkbook workbook = null;
 
-            FileInputStream fileInputStream = new FileInputStream(file);
-            HSSFWorkbook workbook = new HSSFWorkbook(fileInputStream);
+            try
+            {
+                workbook = new HSSFWorkbook(fileInputStream);
+            } catch (IOException e)
+            {
+                System.out.println("IO EXCEPTION");
+            }
+
+            
             HSSFSheet workSheet = workbook.getSheetAt(0);
             HSSFRow row;
             Iterator< Row> rowIterator = workSheet.iterator();
@@ -71,9 +94,8 @@
             String actualItem = "";
             String designation = "";
             String splitCharacter = ":";
-            String[] itemLevel = new String[20];
-            int previousLevel = -1;
-            int actualLevel = -1;
+            String[] fatherList = new String[20];
+            int actualFatherIndex = -1;
             Cell cell;
 
             while (rowIterator.hasNext())
@@ -104,24 +126,23 @@
                 boolean result = vector.length == 2 && vector[1].equalsIgnoreCase("0") ? true : false;
 
                 if (result) {
-                    previousLevel = -1;
-                    actualLevel = 0;
-                    itemLevel[actualLevel] = vector[0];
+                    actualFatherIndex = -1;
                     previousItem = vector[0];
 
-                    System.out.println("Previous: " + previousItem + ", Item: " + itemLevel[actualLevel]);
-
                     String query = "INSERT INTO portifolio(pk_producto, designacao) VALUES(?, ?);";
-                    PreparedStatement statement = connection.prepareStatement(query);
-
-                    statement.setString(1, itemLevel[actualLevel]);
-                    statement.setString(2, designation);
+                    
 
                     try
                     {
+                        PreparedStatement statement = connection.prepareStatement(query);
+
+                        statement.setString(1, vector[0]);
+                        statement.setString(2, designation);
+
                         statement.executeUpdate();
                     } catch (SQLException e)
                     {
+                        System.out.println("SQL EXCEPTION: " + e.toString());
                         System.out.println(e.getStackTrace());
                     }
                 } else {
@@ -129,42 +150,35 @@
                     int previousSize = previousItem.split(splitCharacter).length;
 
                     if (actualSize > previousSize) {
-                        actualLevel++;
-                        previousLevel++;
-                        itemLevel[actualLevel] = actualItem;
-                    } else if (actualSize == previousSize) {
-                        actualLevel++;
-                        itemLevel[actualLevel] = actualItem;
-                        itemLevel[previousLevel] = actualItem;
+                        actualFatherIndex++;
+                        fatherList[actualFatherIndex] = previousItem;
                     } else if (actualSize < previousSize) {
-                        previousLevel--;
+                        int quantStepsBack = previousSize - actualSize;
+
+                        actualFatherIndex -= quantStepsBack;
                     }
 
-                    previousItem = actualItem;
-                    
                     String query = "INSERT INTO portifolio(pk_producto, designacao, fk_producto) VALUES(?, ?, ?);";
-                    PreparedStatement statement = connection.prepareStatement(query);
-
-                    statement.setString(1, actualItem);
-                    statement.setString(2, designation);
-                    statement.setString(3, itemLevel[previousLevel]);
+                    
                     try
                     {
+                        PreparedStatement statement = connection.prepareStatement(query);
+
+                        statement.setString(1, actualItem);
+                        statement.setString(2, designation);
+                        statement.setString(3, fatherList[actualFatherIndex]);
                         statement.executeUpdate();
                     } catch (SQLException e)
                     {
+                        System.out.println("SQL EXCEPTION: " + e.toString());
                         System.out.println(e.getMessage());
                     }
+                    previousItem = actualItem;
                 }
                 
                 System.out.println();
             }
-        } catch (Exception e)
-        {
-            System.out.println("hbhb");
-            System.out.println(e.getMessage());
-            goToErroPage();
-        }
+        System.out.println("Saiu");
     }
 
     public void goToErroPage()
