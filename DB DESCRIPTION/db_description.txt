@@ -2,25 +2,21 @@ portifolio
 	-pk_producto
 	-designacao
 	-fk_producto
+	-preço
 
 armazem
 	-pk_armazem
 	-fk_producto
 	-quant_maxima
-	-quant_actual
+	-quant_actual	
 
-tabela_de_preco
-	-fk_producto
-	-preco
-	-data_de_actualizacao
-
-usuario
+conta
 	-pk_user
-	-nome_usuario
+	-nome_usuario	*unique
 	-password
 	-tipo_usuario
 	-fk_localizacao
-	
+
 localizacao
 	-pk_localizacao
 	-fk_provincia
@@ -32,18 +28,8 @@ provincia
 	-pk_provincia
 	-nome_provincia
 
-municipio
-	-pk_municipio
-	-nome_municipio
-	-fk_provincia
-
-distrito
-	-pk_distrito
-	-nome_distrito
-	-fk_municipio
-
-comuna
-	-pk_comuna
-	-nome_comuna
-	-fk_municipio
+endereço
+	-pk_pai
+	-designacao
+	-fk_filho (endereco pk_pai)
 
