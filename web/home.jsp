@@ -100,7 +100,7 @@
         String previousItem = "";
         String actualItem = "";
         String designation = "";
-        String splitCharacter = ".";
+        String splitCharacter = "\\.";
         String[] fatherList = new String[20];
         int actualFatherIndex = -1;
         Cell cell;
